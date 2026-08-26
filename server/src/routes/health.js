@@ -33,4 +33,28 @@ router.get('/', (req, res) => {
   });
 });
 
+router.get('/llm-test', async (req, res) => {
+  const { GoogleGenerativeAI } = require('@google/generative-ai');
+  const key = process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : '';
+
+  if (!key) {
+    return res.json({ ok: false, message: 'No GEMINI_API_KEY set' });
+  }
+
+  try {
+    const genAI = new GoogleGenerativeAI(key);
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent('Say "OK" in one word.');
+    const text = result.response.text();
+    return res.json({ ok: true, reply: text.trim() });
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      error: err.message,
+      keyPrefix: key.substring(0, 6) + '...',
+      keyLength: key.length,
+    });
+  }
+});
+
 module.exports = router;
