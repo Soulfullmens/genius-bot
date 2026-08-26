@@ -87,10 +87,10 @@ async function generateResponse(userMessage, persona, conversationHistory = []) 
 
   const modelNames = [
     'gemini-2.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-flash',
+    'gemini-flash-latest',
     'gemini-2.5-pro',
-    'gemini-1.5-pro',
+    'gemini-pro-latest',
+    'gemini-3.7-flash',
   ];
   let lastError = null;
 
@@ -138,10 +138,10 @@ async function generateStreamingResponse(
 
   const modelNames = [
     'gemini-2.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-flash',
+    'gemini-flash-latest',
     'gemini-2.5-pro',
-    'gemini-1.5-pro',
+    'gemini-pro-latest',
+    'gemini-3.7-flash',
   ];
   let lastError = null;
 
