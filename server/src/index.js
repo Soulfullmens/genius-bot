@@ -77,6 +77,21 @@ app.use('/api/', limiter);
 
 // ─── Routes ───────────────────────────────────────────────────────────
 
+// Root API welcome endpoint
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'GeniusBot REST API is running 🚀',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      chat: '/api/chat',
+      conversations: '/api/chat/conversations',
+    },
+    docs: 'https://github.com/Soulfullmens/genius-bot',
+  });
+});
+
 app.use('/api/health', healthRoutes);
 app.use('/api/chat', chatRoutes);
 
