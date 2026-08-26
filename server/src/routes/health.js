@@ -43,10 +43,21 @@ router.get('/llm-test', async (req, res) => {
 
   try {
     const genAI = new GoogleGenerativeAI(key);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const result = await model.generateContent('Say "OK" in one word.');
-    const text = result.response.text();
-    return res.json({ ok: true, reply: text.trim() });
+    let text = null;
+    for (const modelName of ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash']) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent('Say "OK" in one word.');
+        text = result.response.text();
+        if (text) break;
+      } catch {
+        // try next
+      }
+    }
+    if (text) {
+      return res.json({ ok: true, reply: text.trim() });
+    }
+    throw new Error('All test models failed');
   } catch (err) {
     return res.status(500).json({
       ok: false,

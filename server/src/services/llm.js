@@ -85,7 +85,13 @@ async function generateResponse(userMessage, persona, conversationHistory = []) 
     return getOfflineStub(persona);
   }
 
-  const modelNames = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+  const modelNames = [
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-2.5-pro',
+    'gemini-1.5-pro',
+  ];
   let lastError = null;
 
   for (const modelName of modelNames) {
@@ -130,7 +136,13 @@ async function generateStreamingResponse(
     return stubText;
   }
 
-  const modelNames = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+  const modelNames = [
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-2.5-pro',
+    'gemini-1.5-pro',
+  ];
   let lastError = null;
 
   for (const modelName of modelNames) {
