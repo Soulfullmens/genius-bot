@@ -37,10 +37,18 @@ const PORT = process.env.PORT || 3001;
 // 1. Security headers
 app.use(helmet());
 
-// 2. CORS — allow the React dev server
+// 2. CORS — allow React frontend (handles '*', specific URL, or comma-separated URLs)
+const corsOrigin = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN === '*'
+    ? true
+    : process.env.CORS_ORIGIN.includes(',')
+    ? process.env.CORS_ORIGIN.split(',').map((s) => s.trim())
+    : process.env.CORS_ORIGIN
+  : true;
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: corsOrigin,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type'],
   })
