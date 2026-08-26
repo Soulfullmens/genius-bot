@@ -1,7 +1,14 @@
 # 🤖 GeniusBot — Full-Stack AI Chat App
 
-> **React + Node.js/Express + MongoDB + Gemini LLM**
-> A production-grade AI chat application with domain-expert personas, streaming responses (SSE), and persistent conversation history.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-genius--bot--topaz.vercel.app-brightgreen?style=for-the-badge&logo=vercel)](https://genius-bot-topaz.vercel.app/)
+[![API Status](https://img.shields.io/badge/API-Render-46E3B7?style=for-the-badge&logo=render)](https://genius-bot-pw7d.onrender.com/api/health)
+[![Tests](https://img.shields.io/badge/Tests-12%2F12%20Passing-success?style=for-the-badge&logo=vitest)](https://github.com/Soulfullmens/genius-bot)
+
+🌐 **Live Demo:** [https://genius-bot-topaz.vercel.app/](https://genius-bot-topaz.vercel.app/)  
+📡 **Live API:** [https://genius-bot-pw7d.onrender.com/api/health](https://genius-bot-pw7d.onrender.com/api/health)
+
+> **React + Node.js/Express + MongoDB + Gemini LLM**  
+> A production-grade AI chat application with domain-expert personas, real-time streaming responses (SSE), and persistent conversation history.
 
 ---
 
