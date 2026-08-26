@@ -87,31 +87,42 @@ async function generateResponse(userMessage, persona, conversationHistory = []) 
 
   const modelNames = [
     'gemini-2.5-flash',
+    'gemini-2.5-flash-lite',
     'gemini-flash-latest',
     'gemini-2.5-pro',
     'gemini-pro-latest',
-    'gemini-3.7-flash',
   ];
   let lastError = null;
 
   for (const modelName of modelNames) {
-    try {
-      const model = client.getGenerativeModel({
-        model: modelName,
-        systemInstruction: SYSTEM_PROMPTS[persona] || SYSTEM_PROMPTS['Education Tutor'],
-      });
-      const history = buildGeminiHistory(conversationHistory);
-      const chat = model.startChat({ history });
-      const result = await chat.sendMessage(userMessage);
-      const text = result.response.text();
-      if (text) return text;
-    } catch (err) {
-      lastError = err;
-      console.warn(`⚠️  Gemini ${modelName} call failed: ${err.message}`);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const model = client.getGenerativeModel({
+          model: modelName,
+          systemInstruction: SYSTEM_PROMPTS[persona] || SYSTEM_PROMPTS['Education Tutor'],
+        });
+        const history = buildGeminiHistory(conversationHistory);
+        const chat = model.startChat({ history });
+        const result = await chat.sendMessage(userMessage);
+        const text = result.response.text();
+        if (text) return text;
+      } catch (err) {
+        lastError = err;
+        console.warn(`⚠️  Gemini ${modelName} attempt ${attempt + 1} failed: ${err.message}`);
+        if (err.message.includes('503') || err.message.includes('429')) {
+          await new Promise((r) => setTimeout(r, 600));
+        } else {
+          break; // Don't retry non-transient errors on same model
+        }
+      }
     }
   }
 
-  throw new Error(`Gemini API error: ${lastError?.message || 'Failed to generate response'}`);
+  throw new Error(
+    lastError?.message?.includes('503')
+      ? "Google's AI service is temporarily experiencing high traffic. Please try again in a moment."
+      : `Gemini API error: ${lastError?.message || 'Failed to generate response'}`
+  );
 }
 
 /**
@@ -138,42 +149,53 @@ async function generateStreamingResponse(
 
   const modelNames = [
     'gemini-2.5-flash',
+    'gemini-2.5-flash-lite',
     'gemini-flash-latest',
     'gemini-2.5-pro',
     'gemini-pro-latest',
-    'gemini-3.7-flash',
   ];
   let lastError = null;
 
   for (const modelName of modelNames) {
-    try {
-      const model = client.getGenerativeModel({
-        model: modelName,
-        systemInstruction: SYSTEM_PROMPTS[persona] || SYSTEM_PROMPTS['Education Tutor'],
-      });
-      const history = buildGeminiHistory(conversationHistory);
-      const chat = model.startChat({ history });
-      const result = await chat.sendMessageStream(userMessage);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const model = client.getGenerativeModel({
+          model: modelName,
+          systemInstruction: SYSTEM_PROMPTS[persona] || SYSTEM_PROMPTS['Education Tutor'],
+        });
+        const history = buildGeminiHistory(conversationHistory);
+        const chat = model.startChat({ history });
+        const result = await chat.sendMessageStream(userMessage);
 
-      let fullResponse = '';
-      for await (const chunk of result.stream) {
-        const text = chunk.text();
-        if (text) {
-          fullResponse += text;
-          onChunk(text);
+        let fullResponse = '';
+        for await (const chunk of result.stream) {
+          const text = chunk.text();
+          if (text) {
+            fullResponse += text;
+            onChunk(text);
+          }
+        }
+
+        if (fullResponse.trim().length > 0) {
+          return fullResponse;
+        }
+      } catch (err) {
+        lastError = err;
+        console.warn(`⚠️  Gemini stream ${modelName} attempt ${attempt + 1} failed: ${err.message}`);
+        if (err.message.includes('503') || err.message.includes('429')) {
+          await new Promise((r) => setTimeout(r, 600));
+        } else {
+          break;
         }
       }
-
-      if (fullResponse.trim().length > 0) {
-        return fullResponse;
-      }
-    } catch (err) {
-      lastError = err;
-      console.warn(`⚠️  Gemini stream with ${modelName} failed: ${err.message}`);
     }
   }
 
-  throw new Error(`Gemini API error: ${lastError?.message || 'Streaming failed'}`);
+  throw new Error(
+    lastError?.message?.includes('503')
+      ? "Google's AI service is temporarily experiencing high traffic. Please try again in a moment."
+      : `Gemini API error: ${lastError?.message || 'Streaming failed'}`
+  );
 }
 
 module.exports = {
